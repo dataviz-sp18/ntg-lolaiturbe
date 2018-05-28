@@ -1,0 +1,63 @@
+---
+title: "Geospatial visualization"
+author: "Dolores De Iturbe"
+date: "05/29/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(plotly)
+
+#working directory
+setwd("~/Dropbox/data_vis/Geo")
+```
+
+## Geospatial visualizations
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, include=FALSE}
+Internet <- read.csv("internet.csv")
+```
+
+The visualization I designed is a map of the 50 states in the US for the percentage of Internet penetration. The data that I use comes from the "Internet World Stats" and it comes from the 2010 US Census. The data can be found in the link: https://www.internetworldstats.com/stats26.htm#america. 
+
+This information is very important for researchers, Internet service provider companies, policymakers and groups that advocate for Internet as a basic right. It is important to understand the amount of people that have access to Internet in each state and which states have a higher or lower penetration. The map very clearly does this. This map can be used to easily show the disparities between states. Policymakers can better understand which states lag behind and pressure Internet Service Providers to increase the number of users in these states. Internet Service Providers can focus on expanding their market in this states.
+
+The scale on the right hand side shows that it ranges from approximately 60-90 %. The tones of blue makes it easy to understand that states that have darker tones have higher Internet penetration percentages than states with lighter shades of blue. We can see that the state with the lowest Internet penetration percentage is Mississippi with only 59.3% of the population. It is also clear that southern states have less Internet penetration than others. New Hampshire has the highest percentage of Internet penetration in its population with 90.1% The map I created is interactive in the sense that when you hover over each state, it tells you the name of the state and the percentage of Internet penetration. You can also zoom in or out of the map. 
+
+I believe that the map is truthful since it includes all the 50 states and DC (including Alaska and Hawaii) and the map looks like a map that the general public is used to seeing. It is also functional because it presents the information in a clear way. It is beautiful because the map is simple and people are used to seeing a map of the US in this shape. The tones of colors are aesthetically pleasing. It is insightful because you do not need extra information to understand what the map portrays making it very comprehensible. 
+
+The most challenging part of the assignment was getting the data frame tidy and finding an example of a map that I wanted to use for the data I had. Once I had all this it was very easy to plot it!
+ 
+
+```{r message=FALSE, warning=FALSE}
+
+Internet <- read.csv("internet.csv")
+
+Internet$hover <- with(Internet, paste(state, '<br>', "Penetration", penetration))
+
+l <- list(color = toRGB("white"), width = 2)
+
+g <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = TRUE,
+  lakecolor = toRGB('white')
+)
+
+p <- plot_geo(Internet, locationmode = 'USA-states') %>%
+  add_trace(
+    z = ~penetration, text = ~hover, locations = ~code,
+    color = ~penetration, colors = 'Blues'
+  ) %>%
+  colorbar(title = "Percentage") %>%
+  layout(
+    title = 'Internet penetration by State<br>(Hover for breakdown)',
+    geo = g
+  )
+
+p
+
+```
+
